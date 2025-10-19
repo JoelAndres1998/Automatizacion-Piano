@@ -1,5 +1,8 @@
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -21,22 +24,27 @@ public class TestReport {
     }
 
     // Registrar resultado de cada paso (nota)
-    public static void resultadoPaso(String escenario, String nota, boolean passed, String details) {
-        String estado = passed ? "PASADO" : "FALLIDO";
-        String color = passed ? "#d4edda" : "#f8d7da";
+    public static void resultadoPaso(String escenario, String nota, boolean pasado, String detalle) {
+        String estado = pasado ? "PASADO" : "FALLIDO";
+        String color = pasado ? "#d4edda" : "#f8d7da";
         String fecha = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
         html.append("<tr style='background-color:" + color + "'>");
         html.append("<td>" + escenario + "</td>");
         html.append("<td>" + fecha + "</td>");
         html.append("<td>" + estado + "</td>");
-        html.append("<td>Nota: " + nota + " - " + details + "</td>");
+        html.append("<td>Nota: " + nota + " - " + detalle + "</td>");
         html.append("</tr>");
     }
 
     public static void finReporte(String filePath) throws IOException {
-        html.append("</table></body></html>");
-        FileWriter writer = new FileWriter(filePath);
-        writer.write(html.toString());
-        writer.close();
+        String cierreTabla = "</table></body></html>";
+        String nuevoContenido = html.toString() + cierreTabla;
+        if (Files.exists(Paths.get(filePath))) {
+            String contenidoExistente = Files.readString(Paths.get(filePath));
+            contenidoExistente = contenidoExistente.replace("</table></body></html>", "");
+            nuevoContenido = contenidoExistente + html.toString().replace("<html><head>","") + cierreTabla;
+        }
+
+        Files.writeString(Paths.get(filePath), nuevoContenido, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 }

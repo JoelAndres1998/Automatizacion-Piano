@@ -8,41 +8,39 @@ import java.io.IOException;
 
 public class PianoTest {
     private WebDriver driver;
+    private PianoPage pianoPage;
 
     @Before
     public void connection() throws IOException, InterruptedException {
         WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
-        String url = PropertieConnection.docProperties("URL");
-        driver.get(url);
+        driver.get(PropertieConnection.docProperties("URL"));
         driver.manage().window().maximize();
         Thread.sleep(2000);
         TestReport.iniciarReporte();
+        pianoPage = new PianoPage(driver);
     }
 
     @Test
     public void escenario1() throws InterruptedException {
-        Escenarios.secuencia1(driver);
+        Escenarios.secuencia1(pianoPage);
     }
 
     @Test
     public void escenario2() throws InterruptedException {
-        for (int i = 0; i < 2; i++) {
-            Escenarios.secuencia1(driver);
-        }
+            Escenarios.secuencia2(pianoPage);
     }
 
     @Test
     public void escenario3() throws InterruptedException {
-        Escenarios.secuencia3(driver);
+        Escenarios.secuencia3(pianoPage);
     }
 
     @After
     public void close() throws IOException {
         driver.close();
-        String projectpath = System.getProperty("user.dir");
-        String informepath =projectpath + "/src/main/resources/Informes/InformePiano.html";
-        TestReport.finReporte(informepath);
+        String projectPath = System.getProperty("user.dir");
+        String informePath = projectPath + "/src/main/resources/Informes/InformePiano.html";
+        TestReport.finReporte(informePath);
     }
 }
-
